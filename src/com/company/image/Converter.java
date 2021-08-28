@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-public class Converter extends ColorSchema implements TextGraphicsConverter {
-    ColorSchema schema = new ColorSchema();
+public class Converter implements TextGraphicsConverter {
+    TextColorSchema schema;
     private int maxWidth = 1_000_000;
     private int maxHeight = 1_000_000;
     private double maxRatio = 0;
@@ -19,19 +19,29 @@ public class Converter extends ColorSchema implements TextGraphicsConverter {
         BufferedImage img = ImageIO.read(new URL(url));
         int newWidth = 0;
         int newHeight = 0;
-        double ratio;
+        double cutCoefficient = 0;
+        double ratio = (img.getWidth() > img.getHeight()) ?  (double)img.getWidth() / img.getHeight() : (double)img.getHeight() / img.getWidth();
+        // проверяем картинку на соотношение сторон
+        // если соотношение сторон слишком большое, выбрасываем исключение
+        if (ratio > this.maxRatio) {
+            throw new BadImageSizeException(ratio, this.maxRatio);
+        }
+        // далее урезаем картинку, если требуется
+        // устанавливаем новые длину и ширину картинки
+        // в cutCoefficient записываем коэффициент в зависимости от того, какая сторона
+        // сильнее не укладывается в заданный диапазон
         if (img.getWidth() > this.maxWidth && img.getHeight() <= this.maxHeight) {
-            ratio = (double) img.getWidth() / maxWidth;
-            newWidth = (int) Math.floor(img.getWidth() / ratio);
-            newHeight = (int) Math.floor(img.getHeight() / ratio);
+            cutCoefficient = (double) img.getWidth() / maxWidth;
+            newWidth = (int) Math.floor(img.getWidth() / cutCoefficient);
+            newHeight = (int) Math.floor(img.getHeight() / cutCoefficient);
         } else if (img.getWidth() > this.maxWidth && img.getHeight() > this.maxHeight) {
-            ratio = (img.getWidth() / maxWidth > img.getHeight() / this.maxHeight) ? (double) img.getWidth() / maxWidth : (double) img.getHeight() / this.maxHeight;
-            newWidth = (int) Math.floor(img.getWidth() / ratio);
-            newHeight = (int) Math.floor(img.getHeight() / ratio);
+            cutCoefficient = (img.getWidth() / maxWidth > img.getHeight() / this.maxHeight) ? (double) img.getWidth() / maxWidth : (double) img.getHeight() / this.maxHeight;
+            newWidth = (int) Math.floor(img.getWidth() / cutCoefficient);
+            newHeight = (int) Math.floor(img.getHeight() / cutCoefficient);
         } else if (img.getWidth() <= this.maxWidth && img.getHeight() > this.maxHeight) {
-            ratio = (double) img.getHeight() / maxHeight;
-            newWidth = (int) Math.floor(img.getWidth() / ratio);
-            newHeight = (int) Math.floor(img.getHeight() / ratio);
+            cutCoefficient = (double) img.getHeight() / maxHeight;
+            newWidth = (int) Math.floor(img.getWidth() / cutCoefficient);
+            newHeight = (int) Math.floor(img.getHeight() / cutCoefficient);
         } else if (img.getWidth() < this.maxWidth && img.getHeight() < this.maxHeight) {
             newWidth = img.getWidth();
             newHeight = img.getHeight();
@@ -47,10 +57,9 @@ public class Converter extends ColorSchema implements TextGraphicsConverter {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < newWidth; i++) {
             for (int j = 0; j < newHeight; j++) {
-                arrayChar[i][j] = schema.convert(bwRaster.getPixel(i, j, new int[3])[0]);
+                arrayChar[i][j] = schema.convert(bwRaster.getPixel(newWidth - i - 1, j, new int[3])[0]);
             }
         }
-
         for (int i = 0; i < arrayChar[0].length; i++) {
             for (int j = 0; j < arrayChar.length; j++) {
                 sb.append(String.valueOf(arrayChar[arrayChar.length - j - 1][i]));
@@ -78,6 +87,7 @@ public class Converter extends ColorSchema implements TextGraphicsConverter {
 
     @Override
     public void setTextColorSchema(TextColorSchema schema) {
-        schema = this.schema;
+        this.schema = schema;
     }
+
 }
