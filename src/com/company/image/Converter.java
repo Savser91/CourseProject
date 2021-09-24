@@ -36,7 +36,7 @@ public class Converter implements TextGraphicsConverter {
     }
 
     private void setImageSize(BufferedImage img) {
-        /**
+        /*
         далее урезаем картинку, устанавливаем новые длину и ширину
          картинки, если требуется
         в cutCoefficient записываем коэффициент в зависимости от того, какая сторона
@@ -46,7 +46,8 @@ public class Converter implements TextGraphicsConverter {
         if (img.getWidth() > this.maxWidth && img.getHeight() <= this.maxHeight) {
             cutCoefficient = (double) img.getWidth() / maxWidth;
         } else if (img.getWidth() > this.maxWidth && img.getHeight() > this.maxHeight) {
-            cutCoefficient = (img.getWidth() / maxWidth > img.getHeight() / this.maxHeight) ? (double) img.getWidth() / maxWidth : (double) img.getHeight() / this.maxHeight;
+            cutCoefficient = (img.getWidth() / maxWidth > img.getHeight() / this.maxHeight) ?
+                    (double) img.getWidth() / maxWidth : (double) img.getHeight() / this.maxHeight;
         } else if (img.getWidth() <= this.maxWidth && img.getHeight() > this.maxHeight) {
             cutCoefficient = (double) img.getHeight() / maxHeight;
         } else if (img.getWidth() < this.maxWidth && img.getHeight() < this.maxHeight) {
