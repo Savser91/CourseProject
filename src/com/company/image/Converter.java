@@ -71,8 +71,8 @@ public class Converter implements TextGraphicsConverter {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < arrayChar[0].length; i++) {
             for (int j = 0; j < arrayChar.length; j++) {
-                sb.append(String.valueOf(arrayChar[arrayChar.length - j - 1][i]));
-                sb.append(String.valueOf(arrayChar[arrayChar.length - j - 1][i]));
+                sb.append(arrayChar[arrayChar.length - j - 1][i]);
+                sb.append(arrayChar[arrayChar.length - j - 1][i]);
             }
             sb.append("\n");
         }
