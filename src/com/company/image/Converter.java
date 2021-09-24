@@ -43,8 +43,6 @@ public class Converter implements TextGraphicsConverter {
         сильнее не укладывается в заданный диапазон
          */
         double cutCoefficient = 0;
-        finalWidth = img.getWidth();
-        finalHeight = img.getHeight();
         if (img.getWidth() > this.maxWidth && img.getHeight() <= this.maxHeight) {
             cutCoefficient = (double) img.getWidth() / maxWidth;
         } else if (img.getWidth() > this.maxWidth && img.getHeight() > this.maxHeight) {
@@ -53,10 +51,8 @@ public class Converter implements TextGraphicsConverter {
         } else if (img.getWidth() <= this.maxWidth && img.getHeight() > this.maxHeight) {
             cutCoefficient = (double) img.getHeight() / maxHeight;
         }
-        if (cutCoefficient != 0) {
-            finalWidth = (int) Math.floor(img.getWidth() / cutCoefficient);
-            finalHeight = (int) Math.floor(img.getHeight() / cutCoefficient);
-        }
+        finalWidth = cutCoefficient == 0 ? img.getWidth() : (int) Math.floor(img.getWidth() / cutCoefficient);
+        finalHeight = cutCoefficient == 0 ? img.getHeight() : (int) Math.floor(img.getHeight() / cutCoefficient);
     }
 
     private char[][] getCharArray(WritableRaster bwRaster) {
